@@ -1,0 +1,1341 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StudyHub - Community Flashcards</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #1f2937;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+            animation: fadeInDown 0.6s ease;
+        }
+
+        header h1 {
+            font-size: 3em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        header p {
+            font-size: 1.2em;
+            opacity: 0.95;
+        }
+
+        .mode-selector {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .mode-btn {
+            padding: 12px 25px;
+            margin: 0 10px;
+            border: 2px solid white;
+            background: transparent;
+            color: white;
+            border-radius: 25px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .mode-btn:hover, .mode-btn.active {
+            background: white;
+            color: #2563eb;
+        }
+
+        .stats-bar {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            animation: fadeInUp 0.6s ease;
+        }
+
+        .stat-card h3 {
+            font-size: 2em;
+            color: #2563eb;
+            margin-bottom: 5px;
+        }
+
+        .stat-card p {
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        @media (max-width: 968px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card-section {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: fadeIn 0.8s ease;
+        }
+
+        .flashcard-container {
+            perspective: 1000px;
+            height: 400px;
+            margin-bottom: 30px;
+        }
+
+        .flashcard {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.6s;
+            cursor: pointer;
+        }
+
+        .flashcard.flipped {
+            transform: rotateY(180deg);
+        }
+
+        .card-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 15px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 40px;
+            text-align: center;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+
+        .card-front {
+            background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+            color: white;
+        }
+
+        .card-back {
+            background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+            color: white;
+            transform: rotateY(180deg);
+        }
+
+        .card-face h2 {
+            font-size: 1.8em;
+            margin-bottom: 20px;
+        }
+
+        .card-face p {
+            font-size: 1.3em;
+            line-height: 1.6;
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-primary {
+            background: #2563eb;
+            color: white;
+        }
+
+        .btn-success {
+            background: #059669;
+            color: white;
+        }
+
+        .btn-danger {
+            background: #dc2626;
+            color: white;
+        }
+
+        .btn-secondary {
+            background: #4b5563;
+            color: white;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 10px;
+            background: #e2e8f0;
+            border-radius: 5px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #2563eb 0%, #3b82f6 100%);
+            transition: width 0.3s ease;
+        }
+
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .sidebar-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            animation: fadeInRight 0.6s ease;
+        }
+
+        .sidebar-card h3 {
+            margin-bottom: 15px;
+            color: #2563eb;
+            font-size: 1.3em;
+        }
+
+        .file-upload {
+            border: 2px dashed #cbd5e0;
+            border-radius: 10px;
+            padding: 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .file-upload:hover {
+            border-color: #2563eb;
+            background: #f0f9ff;
+        }
+
+        .file-upload input {
+            display: none;
+        }
+
+        .deck-list {
+            list-style: none;
+        }
+
+        .deck-item {
+            padding: 15px;
+            background: #f0f9ff;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-left: 4px solid #2563eb;
+        }
+
+        .deck-item:hover {
+            background: #dbeafe;
+            transform: translateX(5px);
+        }
+
+        .deck-item h4 {
+            margin-bottom: 5px;
+            color: #2d3748;
+        }
+
+        .deck-item p {
+            font-size: 0.85em;
+            color: #718096;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: white;
+            padding: 20px 30px;
+            border-radius: 10px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            display: none;
+            animation: slideInRight 0.4s ease;
+            z-index: 1000;
+        }
+
+        .notification.show {
+            display: block;
+        }
+
+        .notification.success {
+            border-left: 5px solid #059669;
+        }
+
+        .notification.error {
+            border-left: 5px solid #dc2626;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeInRight {
+            from { opacity: 0; transform: translateX(20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        @keyframes slideInRight {
+            from { transform: translateX(400px); }
+            to { transform: translateX(0); }
+        }
+
+        .spaced-badge {
+            display: inline-block;
+            padding: 5px 15px;
+            background: #fbbf24;
+            color: #78350f;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+            margin-top: 10px;
+        }
+
+        .download-link {
+            display: inline-block;
+            margin-top: 15px;
+            color: #2563eb;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .download-link:hover {
+            text-decoration: underline;
+        }
+
+        .deck-name-input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 2px solid #cbd5e0;
+            border-radius: 8px;
+            font-size: 1em;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+        }
+
+        /* Auth & Profile Styles */
+        .user-header {
+            display: none;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 15px;
+            padding: 15px 20px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 15px;
+            margin-bottom: 20px;
+            color: white;
+        }
+
+        .user-header.active {
+            display: flex;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+
+        .user-info {
+            flex: 1;
+        }
+
+        .user-stats {
+            font-size: 0.85em;
+            opacity: 0.9;
+        }
+
+        .btn-logout {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+
+        .auth-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            max-width: 400px;
+            width: 90%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+        }
+
+        .modal-content h2 {
+            margin-bottom: 20px;
+            color: #2563eb;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #4b5563;
+            font-weight: 600;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 1em;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #2563eb;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .modal-buttons button {
+            flex: 1;
+        }
+
+        .close-modal {
+            background: #6b7280;
+        }
+
+        /* Community Feed Styles */
+        .community-deck-item {
+            background: #f0f9ff;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            border-left: 4px solid #2563eb;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .community-deck-item:hover {
+            background: #dbeafe;
+            transform: translateX(5px);
+        }
+
+        .community-deck-item h4 {
+            color: #1e40af;
+            margin-bottom: 8px;
+        }
+
+        .community-deck-item .deck-description {
+            font-size: 0.9em;
+            color: #4b5563;
+            margin-bottom: 10px;
+        }
+
+        .deck-meta {
+            display: flex;
+            gap: 15px;
+            font-size: 0.85em;
+            color: #6b7280;
+            margin: 10px 0;
+        }
+
+        .deck-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .deck-actions button {
+            padding: 8px 15px;
+            font-size: 0.9em;
+        }
+
+        .liked {
+            background: #dc2626 !important;
+        }
+
+        .comments-section {
+            margin-top: 20px;
+            padding: 20px;
+            background: #f9fafb;
+            border-radius: 10px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .comment-item {
+            padding: 10px;
+            background: white;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+
+        .comment-author {
+            font-weight: 600;
+            color: #2563eb;
+            margin-bottom: 5px;
+        }
+
+        .comment-text {
+            color: #4b5563;
+        }
+
+        .comment-time {
+            font-size: 0.75em;
+            color: #9ca3af;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Auth Modals -->
+    <div id="loginModal" class="modal">
+        <div class="modal-content">
+            <h2>🔐 Login</h2>
+            <div class="form-group">
+                <label>Username</label>
+                <input type="text" id="loginUsername" placeholder="Enter username">
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" id="loginPassword" placeholder="Enter password">
+            </div>
+            <div class="modal-buttons">
+                <button class="btn-primary" onclick="performLogin()">Login</button>
+                <button class="close-modal btn-secondary" onclick="closeModal('loginModal')">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="registerModal" class="modal">
+        <div class="modal-content">
+            <h2>📝 Register</h2>
+            <div class="form-group">
+                <label>Username</label>
+                <input type="text" id="regUsername" placeholder="Choose a username">
+            </div>
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" id="regEmail" placeholder="your@email.com">
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" id="regPassword" placeholder="Enter password">
+            </div>
+            <div class="form-group">
+                <label>Confirm Password</label>
+                <input type="password" id="regPassword2" placeholder="Confirm password">
+            </div>
+            <div class="modal-buttons">
+                <button class="btn-success" onclick="performRegister()">Register</button>
+                <button class="close-modal btn-secondary" onclick="closeModal('registerModal')">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- User Header -->
+        <div id="userHeader" class="user-header">
+            <div class="user-avatar" id="userAvatar">U</div>
+            <div class="user-info">
+                <div id="userName">Guest</div>
+                <div class="user-stats" id="userStats">Not logged in</div>
+            </div>
+            <button class="btn-logout" onclick="logout()">Logout</button>
+        </div>
+
+        <!-- Auth Buttons (for non-logged in users) -->
+        <div id="authButtons" class="auth-buttons">
+            <button class="btn-primary" onclick="openModal('loginModal')">🔐 Login</button>
+            <button class="btn-success" onclick="openModal('registerModal')">📝 Register</button>
+        </div>
+
+        <header>
+            <h1>📚 StudyHub</h1>
+            <p>Master any subject with community-powered flashcards</p>
+        </header>
+
+        <div class="mode-selector">
+            <button class="mode-btn active" onclick="setMode('demo')" id="demoBtn">🎮 Demo Mode</button>
+            <button class="mode-btn" onclick="setMode('live')" id="liveBtn">🔴 Live Mode</button>
+        </div>
+
+        <div class="stats-bar">
+            <div class="stat-card">
+                <h3 id="totalCards">0</h3>
+                <p>Total Cards</p>
+            </div>
+            <div class="stat-card">
+                <h3 id="correctAnswers">0</h3>
+                <p>Correct</p>
+            </div>
+            <div class="stat-card">
+                <h3 id="accuracy">0%</h3>
+                <p>Accuracy</p>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="card-section">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressBar"></div>
+                </div>
+
+                <div class="flashcard-container">
+                    <div class="flashcard" id="flashcard">
+                        <div class="card-face card-front">
+                            <h2>Question</h2>
+                            <p id="questionText">Select a deck to start studying!</p>
+                        </div>
+                        <div class="card-face card-back">
+                            <h2>Answer</h2>
+                            <p id="answerText">The answer will appear here</p>
+                            <span class="spaced-badge" id="spacedBadge" style="display: none;">⭐ Spaced Repetition</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="controls">
+                    <button class="btn-danger" onclick="markWrong()">❌ Wrong</button>
+                    <button class="btn-primary" onclick="flipCard()">🔄 Flip Card</button>
+                    <button class="btn-success" onclick="markCorrect()">✅ Correct</button>
+                </div>
+
+                <div class="controls">
+                    <button class="btn-secondary" onclick="previousCard()">← Previous</button>
+                    <button class="btn-secondary" onclick="nextCard()">Next →</button>
+                    <button class="btn-secondary" onclick="shuffleCards()">🔀 Shuffle</button>
+                </div>
+            </div>
+
+            <div class="sidebar">
+                <div class="sidebar-card">
+                    <h3>📤 Upload Flashcards</h3>
+                    <input type="text" id="deckNameInput" class="deck-name-input" placeholder="Enter deck name...">
+                    <div class="file-upload" onclick="document.getElementById('fileInput').click()">
+                        <p>📁 Click to upload JSON</p>
+                        <p style="font-size: 0.85em; color: #718096; margin-top: 10px;">Drag & drop or click to browse</p>
+                        <input type="file" id="fileInput" accept=".json" onchange="loadJSON(event)">
+                    </div>
+                    <a href="#" class="download-link" onclick="downloadTemplate()">⬇️ Download Template</a>
+                </div>
+
+                <div class="sidebar-card">
+                    <h3 id="decksTitle">📚 Demo Decks</h3>
+                    <div id="decksList" class="loading">Loading decks...</div>
+                </div>
+
+                <div class="sidebar-card">
+                    <h3>🌐 Community Feed</h3>
+                    <div id="communityFeed" class="loading">Loading community decks...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="notification" id="notification"></div>
+
+    <script>
+        const API_BASE = '/api';
+        let appMode = 'demo'; // 'demo' or 'live'
+        let currentDeckId = null;
+        let currentSessionId = null;
+        let currentUser = null;
+        
+        // Demo data
+        const DEMO_FLASHCARDS = [
+            {
+                question: "What is the powerhouse of the cell?",
+                answer: "Mitochondria - they produce ATP through cellular respiration",
+                spacedRepetition: true
+            },
+            {
+                question: "What is the chemical symbol for water?",
+                answer: "H₂O - Two hydrogen atoms bonded to one oxygen atom",
+                spacedRepetition: false
+            },
+            {
+                question: "Who wrote 'Romeo and Juliet'?",
+                answer: "William Shakespeare - written around 1594-1596",
+                spacedRepetition: false
+            },
+            {
+                question: "What is the speed of light?",
+                answer: "299,792,458 meters per second (approximately 300,000 km/s)",
+                spacedRepetition: true
+            },
+            {
+                question: "What is photosynthesis?",
+                answer: "The process by which plants convert sunlight, water, and CO₂ into glucose and oxygen",
+                spacedRepetition: true
+            }
+        ];
+
+        let flashcards = [];
+        let currentCardIndex = 0;
+        let correctCount = 0;
+        let totalAttempts = 0;
+        let isFlipped = false;
+
+        // ========== AUTHENTICATION FUNCTIONS ==========
+        
+        function getAuthHeaders() {
+            const token = localStorage.getItem('access_token');
+            return token ? {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            } : {'Content-Type': 'application/json'};
+        }
+
+        function openModal(modalId) {
+            document.getElementById(modalId).classList.add('active');
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+        }
+
+        async function performLogin() {
+            const username = document.getElementById('loginUsername').value;
+            const password = document.getElementById('loginPassword').value;
+
+            if (!username || !password) {
+                showNotification('Please fill in all fields', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/login/', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({username, password})
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    localStorage.setItem('access_token', data.access);
+                    localStorage.setItem('refresh_token', data.refresh);
+                    closeModal('loginModal');
+                    showNotification('Login successful! 🎉', 'success');
+                    await loadUserProfile();
+                    loadLiveDecks();
+                    loadCommunityFeed();
+                } else {
+                    showNotification('Invalid credentials', 'error');
+                }
+            } catch (error) {
+                console.error('Login error:', error);
+                showNotification('Login failed', 'error');
+            }
+
+            document.getElementById('loginUsername').value = '';
+            document.getElementById('loginPassword').value = '';
+        }
+
+        async function performRegister() {
+            const username = document.getElementById('regUsername').value;
+            const email = document.getElementById('regEmail').value;
+            const password = document.getElementById('regPassword').value;
+            const password2 = document.getElementById('regPassword2').value;
+
+            if (!username || !email || !password || !password2) {
+                showNotification('Please fill in all fields', 'error');
+                return;
+            }
+
+            if (password !== password2) {
+                showNotification("Passwords don't match", 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/register/', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({username, email, password, password2})
+                });
+
+                if (response.ok) {
+                    closeModal('registerModal');
+                    showNotification('Registration successful! Please login.', 'success');
+                    setTimeout(() => openModal('loginModal'), 1000);
+                } else {
+                    const error = await response.json();
+                    showNotification('Registration failed: ' + JSON.stringify(error), 'error');
+                }
+            } catch (error) {
+                console.error('Registration error:', error);
+                showNotification('Registration failed', 'error');
+            }
+
+            document.getElementById('regUsername').value = '';
+            document.getElementById('regEmail').value = '';
+            document.getElementById('regPassword').value = '';
+            document.getElementById('regPassword2').value = '';
+        }
+
+        async function loadUserProfile() {
+            const token = localStorage.getItem('access_token');
+            if (!token) {
+                document.getElementById('userHeader').classList.remove('active');
+                document.getElementById('authButtons').style.display = 'flex';
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/profile/', {
+                    headers: getAuthHeaders()
+                });
+
+                if (response.ok) {
+                    currentUser = await response.json();
+                    document.getElementById('userName').textContent = currentUser.username;
+                    document.getElementById('userStats').textContent = 
+                        `${currentUser.decks_created} decks • ${currentUser.study_sessions} sessions`;
+                    document.getElementById('userAvatar').textContent = 
+                        currentUser.username.charAt(0).toUpperCase();
+                    document.getElementById('userHeader').classList.add('active');
+                    document.getElementById('authButtons').style.display = 'none';
+                } else {
+                    localStorage.removeItem('access_token');
+                    localStorage.removeItem('refresh_token');
+                }
+            } catch (error) {
+                console.error('Error loading profile:', error);
+            }
+        }
+
+        function logout() {
+            localStorage.removeItem('access_token');
+            localStorage.removeItem('refresh_token');
+            currentUser = null;
+            document.getElementById('userHeader').classList.remove('active');
+            document.getElementById('authButtons').style.display = 'flex';
+            showNotification('Logged out successfully', 'success');
+            setMode('demo');
+        }
+
+        // ========== COMMUNITY FUNCTIONS ==========
+
+        async function loadCommunityFeed() {
+            const feedDiv = document.getElementById('communityFeed');
+            
+            try {
+                const response = await fetch('/api/decks/community/');
+                const decks = await response.json();
+                
+                if (decks.length === 0) {
+                    feedDiv.innerHTML = '<p style="color: #666; text-align: center;">No community decks yet</p>';
+                    return;
+                }
+                
+                const html = decks.map(deck => `
+                    <div class="community-deck-item">
+                        <h4>${deck.name}</h4>
+                        <div class="deck-description">${deck.description || 'No description'}</div>
+                        <div class="deck-meta">
+                            <span>👤 ${deck.owner_name || 'Anonymous'}</span>
+                            <span>❤️ ${deck.likes_count}</span>
+                            <span>💬 ${deck.comments_count}</span>
+                            <span>📚 ${deck.card_count} cards</span>
+                        </div>
+                        <div class="deck-actions">
+                            <button class="btn-primary btn-sm" onclick="loadCommunityDeck(${deck.id})">Study</button>
+                            <button class="btn-${deck.is_liked ? 'danger liked' : 'secondary'} btn-sm" 
+                                    onclick="toggleLike(${deck.id}, this)"
+                                    ${!currentUser ? 'disabled' : ''}>
+                                ${deck.is_liked ? '❤️ Liked' : '🤍 Like'}
+                            </button>
+                        </div>
+                    </div>
+                `).join('');
+                
+                feedDiv.innerHTML = html;
+            } catch (error) {
+                console.error('Error loading community feed:', error);
+                feedDiv.innerHTML = '<p style="color: #dc2626;">Error loading feed</p>';
+            }
+        }
+
+        async function loadCommunityDeck(deckId) {
+            try {
+                const response = await fetch(`${API_BASE}/decks/${deckId}/`);
+                const deck = await response.json();
+                
+                flashcards = deck.flashcards.map(card => ({
+                    question: card.question,
+                    answer: card.answer,
+                    spacedRepetition: card.spaced_repetition
+                }));
+                
+                currentDeckId = deckId;
+                currentCardIndex = 0;
+                isFlipped = false;
+                correctCount = 0;
+                totalAttempts = 0;
+                
+                displayCard();
+                showNotification(`Loaded ${deck.name} from community! 🌐`, 'success');
+            } catch (error) {
+                console.error('Error loading community deck:', error);
+                showNotification('Error loading deck', 'error');
+            }
+        }
+
+        async function toggleLike(deckId, button) {
+            if (!currentUser) {
+                showNotification('Please login to like decks', 'error');
+                return;
+            }
+
+            try {
+                const isLiked = button.classList.contains('liked');
+                const method = isLiked ? 'DELETE' : 'POST';
+                const endpoint = isLiked ? 'unlike' : 'like';
+                
+                const response = await fetch(`/api/decks/${deckId}/${endpoint}/`, {
+                    method: method,
+                    headers: getAuthHeaders()
+                });
+
+                if (response.ok) {
+                    loadCommunityFeed(); // Refresh to show updated likes
+                    showNotification(isLiked ? 'Like removed' : 'Deck liked! ❤️', 'success');
+                }
+            } catch (error) {
+                console.error('Error toggling like:', error);
+                showNotification('Error updating like', 'error');
+            }
+        }
+
+        // ========== ORIGINAL FUNCTIONS (Updated) ==========
+
+        function setMode(mode) {
+            appMode = mode;
+            document.getElementById('demoBtn').classList.toggle('active', mode === 'demo');
+            document.getElementById('liveBtn').classList.toggle('active', mode === 'live');
+            
+            if (mode === 'demo') {
+                document.getElementById('decksTitle').textContent = '📚 Demo Decks';
+                loadDemoDecks();
+            } else {
+                document.getElementById('decksTitle').textContent = '📚 Your Decks';
+                loadLiveDecks();
+            }
+            
+            showNotification(`Switched to ${mode === 'demo' ? 'Demo' : 'Live'} Mode`, 'success');
+        }
+
+        function loadDemoDecks() {
+            const decksList = document.getElementById('decksList');
+            decksList.innerHTML = `
+                <ul class="deck-list">
+                    <li class="deck-item" onclick="loadDemoDeck('biology')">
+                        <h4>🧬 Biology 101</h4>
+                        <p>5 cards • Cell Biology</p>
+                    </li>
+                    <li class="deck-item" onclick="loadDemoDeck('demo')">
+                        <h4>🎯 Quick Demo</h4>
+                        <p>5 cards • Mixed Topics</p>
+                    </li>
+                </ul>
+            `;
+        }
+
+        async function loadLiveDecks() {
+            const decksList = document.getElementById('decksList');
+            try {
+                const response = await fetch(`${API_BASE}/decks/`);
+                const decks = await response.json();
+                
+                if (decks.length === 0) {
+                    decksList.innerHTML = '<p style="color: #666; text-align: center;">No decks yet. Upload one to get started!</p>';
+                    return;
+                }
+                
+                const decksHTML = decks.map(deck => `
+                    <div class="deck-item" onclick="loadLiveDeck(${deck.id})">
+                        <h4>📚 ${deck.name}</h4>
+                        <p>${deck.card_count} cards</p>
+                    </div>
+                `).join('');
+                
+                decksList.innerHTML = `<div class="deck-list">${decksHTML}</div>`;
+            } catch (error) {
+                console.error('Error loading decks:', error);
+                decksList.innerHTML = '<p style="color: #dc2626;">Error loading decks</p>';
+            }
+        }
+
+        function loadDemoDeck(deckName) {
+            flashcards = [...DEMO_FLASHCARDS];
+            currentCardIndex = 0;
+            isFlipped = false;
+            correctCount = 0;
+            totalAttempts = 0;
+            displayCard();
+            showNotification(`Loaded demo deck! 🎮`, 'success');
+        }
+
+        async function loadLiveDeck(deckId) {
+            try {
+                const response = await fetch(`${API_BASE}/decks/${deckId}/`);
+                const deck = await response.json();
+                
+                flashcards = deck.flashcards.map(card => ({
+                    question: card.question,
+                    answer: card.answer,
+                    spacedRepetition: card.spaced_repetition
+                }));
+                
+                currentDeckId = deckId;
+                currentCardIndex = 0;
+                isFlipped = false;
+                correctCount = 0;
+                totalAttempts = 0;
+                
+                // Create a study session
+                const sessionResponse = await fetch(`${API_BASE}/sessions/`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({deck: deckId})
+                });
+                const session = await sessionResponse.json();
+                currentSessionId = session.id;
+                
+                displayCard();
+                showNotification(`Loaded ${deck.name}! 📚`, 'success');
+            } catch (error) {
+                console.error('Error loading deck:', error);
+                showNotification('Error loading deck', 'error');
+            }
+        }
+
+        function updateStats() {
+            document.getElementById('totalCards').textContent = flashcards.length;
+            document.getElementById('correctAnswers').textContent = correctCount;
+            const accuracy = totalAttempts > 0 ? Math.round((correctCount / totalAttempts) * 100) : 0;
+            document.getElementById('accuracy').textContent = accuracy + '%';
+            
+            const progress = flashcards.length > 0 ? ((currentCardIndex + 1) / flashcards.length) * 100 : 0;
+            document.getElementById('progressBar').style.width = progress + '%';
+        }
+
+        function displayCard() {
+            if (flashcards.length === 0) {
+                document.getElementById('questionText').textContent = 'Select a deck to start studying!';
+                document.getElementById('answerText').textContent = 'The answer will appear here';
+                updateStats();
+                return;
+            }
+            
+            const card = flashcards[currentCardIndex];
+            document.getElementById('questionText').textContent = card.question;
+            document.getElementById('answerText').textContent = card.answer;
+            
+            const badge = document.getElementById('spacedBadge');
+            badge.style.display = card.spacedRepetition ? 'inline-block' : 'none';
+            
+            if (isFlipped) {
+                document.getElementById('flashcard').classList.add('flipped');
+            } else {
+                document.getElementById('flashcard').classList.remove('flipped');
+            }
+            
+            updateStats();
+        }
+
+        function flipCard() {
+            isFlipped = !isFlipped;
+            document.getElementById('flashcard').classList.toggle('flipped');
+        }
+
+        function nextCard() {
+            isFlipped = false;
+            currentCardIndex = (currentCardIndex + 1) % flashcards.length;
+            displayCard();
+        }
+
+        function previousCard() {
+            isFlipped = false;
+            currentCardIndex = (currentCardIndex - 1 + flashcards.length) % flashcards.length;
+            displayCard();
+        }
+
+        async function markCorrect() {
+            totalAttempts++;
+            correctCount++;
+            
+            if (appMode === 'live' && currentSessionId) {
+                try {
+                    await fetch(`${API_BASE}/sessions/${currentSessionId}/record_answer/`, {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({correct: true})
+                    });
+                } catch (error) {
+                    console.error('Error recording answer:', error);
+                }
+            }
+            
+            showNotification('Correct! Great job! 🎉', 'success');
+            setTimeout(() => nextCard(), 500);
+        }
+
+        async function markWrong() {
+            totalAttempts++;
+            
+            if (appMode === 'live' && currentSessionId) {
+                try {
+                    await fetch(`${API_BASE}/sessions/${currentSessionId}/record_answer/`, {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({correct: false})
+                    });
+                } catch (error) {
+                    console.error('Error recording answer:', error);
+                }
+            }
+            
+            showNotification('Keep trying! Review this card again. 💪', 'error');
+            
+            const currentCard = flashcards[currentCardIndex];
+            currentCard.spacedRepetition = true;
+            flashcards.push({...currentCard});
+            
+            setTimeout(() => nextCard(), 500);
+        }
+
+        function shuffleCards() {
+            for (let i = flashcards.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [flashcards[i], flashcards[j]] = [flashcards[j], flashcards[i]];
+            }
+            currentCardIndex = 0;
+            isFlipped = false;
+            displayCard();
+            showNotification('Cards shuffled! 🔀', 'success');
+        }
+
+        async function loadJSON(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const deckName = document.getElementById('deckNameInput').value.trim();
+            if (!deckName && appMode === 'live') {
+                showNotification('Please enter a deck name first!', 'error');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = async function(e) {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    
+                    if (appMode === 'demo') {
+                        // Demo mode - just load locally
+                        if (Array.isArray(data) && data.length > 0) {
+                            flashcards = data.map(card => ({
+                                question: card.question || '',
+                                answer: card.answer || '',
+                                spacedRepetition: card.spacedRepetition || false
+                            }));
+                            currentCardIndex = 0;
+                            isFlipped = false;
+                            correctCount = 0;
+                            totalAttempts = 0;
+                            displayCard();
+                            showNotification('Flashcards loaded in demo mode! 📚', 'success');
+                        } else {
+                            showNotification('Invalid JSON format. Please check the template.', 'error');
+                        }
+                    } else {
+                        // Live mode - upload to backend
+                        const uploadData = Array.isArray(data) ? {
+                            deck_name: deckName,
+                            flashcards: data
+                        } : data;
+                        
+                        if (!uploadData.deck_name) {
+                            uploadData.deck_name = deckName;
+                        }
+                        
+                        const response = await fetch(`${API_BASE}/decks/upload/`, {
+                            method: 'POST',
+                            headers: {'Content-Type': 'application/json'},
+                            body: JSON.stringify(uploadData)
+                        });
+                        
+                        if (response.ok) {
+                            const deck = await response.json();
+                            showNotification('Deck uploaded successfully! 🎉', 'success');
+                            document.getElementById('deckNameInput').value = '';
+                            loadLiveDecks();
+                            loadLiveDeck(deck.id);
+                        } else {
+                            const error = await response.json();
+                            showNotification('Upload failed: ' + JSON.stringify(error), 'error');
+                        }
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    showNotification('Error processing file: ' + error.message, 'error');
+                }
+            };
+            reader.readAsText(file);
+            event.target.value = '';
+        }
+
+        function downloadTemplate() {
+            const template = [
+                {
+                    question: "Your question here?",
+                    answer: "Your answer here",
+                    spacedRepetition: false
+                },
+                {
+                    question: "Another question?",
+                    answer: "Another answer",
+                    spacedRepetition: true
+                }
+            ];
+            
+            const dataStr = JSON.stringify(template, null, 2);
+            const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+            
+            const exportFileDefaultName = 'flashcards_template.json';
+            
+            const linkElement = document.createElement('a');
+            linkElement.setAttribute('href', dataUri);
+            linkElement.setAttribute('download', exportFileDefaultName);
+            linkElement.click();
+            
+            showNotification('Template downloaded! 📥', 'success');
+        }
+
+        function showNotification(message, type) {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.className = 'notification show ' + type;
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+
+        // Enable click on card to flip
+        document.getElementById('flashcard').addEventListener('click', flipCard);
+
+        // Initialize
+        loadUserProfile();
+        loadDemoDecks();
+        loadCommunityFeed();
+        displayCard();
+    </script>
+</body>
+</html>

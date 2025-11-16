@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StudyHub - Community Flashcards</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #1f2937;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+            animation: fadeInDown 0.6s ease;
+        }
+
+        header h1 {
+            font-size: 3em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        header p {
+            font-size: 1.2em;
+            opacity: 0.95;
+        }
+
+        .stats-bar {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            animation: fadeInUp 0.6s ease;
+        }
+
+        .stat-card h3 {
+            font-size: 2em;
+            color: #2563eb;
+            margin-bottom: 5px;
+        }
+
+        .stat-card p {
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        @media (max-width: 968px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card-section {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: fadeIn 0.8s ease;
+        }
+
+        .flashcard-container {
+            perspective: 1000px;
+            height: 400px;
+            margin-bottom: 30px;
+        }
+
+        .flashcard {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.6s;
+            cursor: pointer;
+        }
+
+        .flashcard.flipped {
+            transform: rotateY(180deg);
+        }
+
+        .card-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 15px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 40px;
+            text-align: center;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+
+        .card-front {
+            background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+            color: white;
+        }
+
+        .card-back {
+            background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+            color: white;
+            transform: rotateY(180deg);
+        }
+
+        .card-face h2 {
+            font-size: 1.8em;
+            margin-bottom: 20px;
+        }
+
+        .card-face p {
+            font-size: 1.3em;
+            line-height: 1.6;
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
+
+        .btn-primary {
+            background: #2563eb;
+            color: white;
+        }
+
+        .btn-success {
+            background: #059669;
+            color: white;
+        }
+
+        .btn-danger {
+            background: #dc2626;
+            color: white;
+        }
+
+        .btn-secondary {
+            background: #4b5563;
+            color: white;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 10px;
+            background: #e2e8f0;
+            border-radius: 5px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #2563eb 0%, #3b82f6 100%);
+            transition: width 0.3s ease;
+        }
+
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .sidebar-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            animation: fadeInRight 0.6s ease;
+        }
+
+        .sidebar-card h3 {
+            margin-bottom: 15px;
+            color: #2563eb;
+            font-size: 1.3em;
+        }
+
+        .file-upload {
+            border: 2px dashed #cbd5e0;
+            border-radius: 10px;
+            padding: 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .file-upload:hover {
+            border-color: #2563eb;
+            background: #f0f9ff;
+        }
+
+        .file-upload input {
+            display: none;
+        }
+
+        .deck-list {
+            list-style: none;
+        }
+
+        .deck-item {
+            padding: 15px;
+            background: #f0f9ff;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-left: 4px solid #2563eb;
+        }
+
+        .deck-item:hover {
+            background: #dbeafe;
+            transform: translateX(5px);
+        }
+
+        .deck-item h4 {
+            margin-bottom: 5px;
+            color: #2d3748;
+        }
+
+        .deck-item p {
+            font-size: 0.85em;
+            color: #718096;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: white;
+            padding: 20px 30px;
+            border-radius: 10px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            display: none;
+            animation: slideInRight 0.4s ease;
+            z-index: 1000;
+        }
+
+        .notification.show {
+            display: block;
+        }
+
+        .notification.success {
+            border-left: 5px solid #059669;
+        }
+
+        .notification.error {
+            border-left: 5px solid #dc2626;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeInRight {
+            from { opacity: 0; transform: translateX(20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        @keyframes slideInRight {
+            from { transform: translateX(400px); }
+            to { transform: translateX(0); }
+        }
+
+        .spaced-badge {
+            display: inline-block;
+            padding: 5px 15px;
+            background: #fbbf24;
+            color: #78350f;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+            margin-top: 10px;
+        }
+
+        .download-link {
+            display: inline-block;
+            margin-top: 15px;
+            color: #2563eb;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .download-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📚 StudyHub</h1>
+            <p>Master any subject with community-powered flashcards</p>
+        </header>
+
+        <div class="stats-bar">
+            <div class="stat-card">
+                <h3 id="totalCards">0</h3>
+                <p>Total Cards</p>
+            </div>
+            <div class="stat-card">
+                <h3 id="correctAnswers">0</h3>
+                <p>Correct</p>
+            </div>
+            <div class="stat-card">
+                <h3 id="accuracy">0%</h3>
+                <p>Accuracy</p>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="card-section">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressBar"></div>
+                </div>
+
+                <div class="flashcard-container">
+                    <div class="flashcard" id="flashcard">
+                        <div class="card-face card-front">
+                            <h2>Question</h2>
+                            <p id="questionText">Click to start studying!</p>
+                        </div>
+                        <div class="card-face card-back">
+                            <h2>Answer</h2>
+                            <p id="answerText">The answer will appear here</p>
+                            <span class="spaced-badge" id="spacedBadge" style="display: none;">⭐ Spaced Repetition</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="controls">
+                    <button class="btn-danger" onclick="markWrong()">❌ Wrong</button>
+                    <button class="btn-primary" onclick="flipCard()">🔄 Flip Card</button>
+                    <button class="btn-success" onclick="markCorrect()">✅ Correct</button>
+                </div>
+
+                <div class="controls">
+                    <button class="btn-secondary" onclick="previousCard()">← Previous</button>
+                    <button class="btn-secondary" onclick="nextCard()">Next →</button>
+                    <button class="btn-secondary" onclick="shuffleCards()">🔀 Shuffle</button>
+                </div>
+            </div>
+
+            <div class="sidebar">
+                <div class="sidebar-card">
+                    <h3>📤 Upload Flashcards</h3>
+                    <div class="file-upload" onclick="document.getElementById('fileInput').click()">
+                        <p>📁 Click to upload JSON</p>
+                        <p style="font-size: 0.85em; color: #718096; margin-top: 10px;">Drag & drop or click to browse</p>
+                        <input type="file" id="fileInput" accept=".json" onchange="loadJSON(event)">
+                    </div>
+                    <a href="#" class="download-link" onclick="downloadTemplate()">⬇️ Download Template</a>
+                </div>
+
+                <div class="sidebar-card">
+                    <h3>📚 Community Decks</h3>
+                    <ul class="deck-list">
+                        <li class="deck-item" onclick="loadDeck('biology')">
+                            <h4>Biology 101</h4>
+                            <p>25 cards • Cell Biology</p>
+                        </li>
+                        <li class="deck-item" onclick="loadDeck('chemistry')">
+                            <h4>Chemistry Basics</h4>
+                            <p>30 cards • Periodic Table</p>
+                        </li>
+                        <li class="deck-item" onclick="loadDeck('history')">
+                            <h4>World History</h4>
+                            <p>40 cards • Modern Era</p>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="notification" id="notification"></div>
+
+    <script>
+        let flashcards = [
+            {
+                question: "What is the powerhouse of the cell?",
+                answer: "Mitochondria - they produce ATP through cellular respiration",
+                spacedRepetition: true
+            },
+            {
+                question: "What is the chemical symbol for water?",
+                answer: "H₂O - Two hydrogen atoms bonded to one oxygen atom",
+                spacedRepetition: false
+            },
+            {
+                question: "Who wrote 'Romeo and Juliet'?",
+                answer: "William Shakespeare - written around 1594-1596",
+                spacedRepetition: false
+            },
+            {
+                question: "What is the speed of light?",
+                answer: "299,792,458 meters per second (approximately 300,000 km/s)",
+                spacedRepetition: true
+            },
+            {
+                question: "What is photosynthesis?",
+                answer: "The process by which plants convert sunlight, water, and CO₂ into glucose and oxygen",
+                spacedRepetition: true
+            }
+        ];
+
+        let currentCardIndex = 0;
+        let correctCount = 0;
+        let totalAttempts = 0;
+        let isFlipped = false;
+
+        function updateStats() {
+            document.getElementById('totalCards').textContent = flashcards.length;
+            document.getElementById('correctAnswers').textContent = correctCount;
+            const accuracy = totalAttempts > 0 ? Math.round((correctCount / totalAttempts) * 100) : 0;
+            document.getElementById('accuracy').textContent = accuracy + '%';
+            
+            const progress = ((currentCardIndex + 1) / flashcards.length) * 100;
+            document.getElementById('progressBar').style.width = progress + '%';
+        }
+
+        function displayCard() {
+            if (flashcards.length === 0) return;
+            
+            const card = flashcards[currentCardIndex];
+            document.getElementById('questionText').textContent = card.question;
+            document.getElementById('answerText').textContent = card.answer;
+            
+            const badge = document.getElementById('spacedBadge');
+            badge.style.display = card.spacedRepetition ? 'inline-block' : 'none';
+            
+            if (isFlipped) {
+                document.getElementById('flashcard').classList.add('flipped');
+            } else {
+                document.getElementById('flashcard').classList.remove('flipped');
+            }
+            
+            updateStats();
+        }
+
+        function flipCard() {
+            isFlipped = !isFlipped;
+            document.getElementById('flashcard').classList.toggle('flipped');
+        }
+
+        function nextCard() {
+            isFlipped = false;
+            currentCardIndex = (currentCardIndex + 1) % flashcards.length;
+            displayCard();
+        }
+
+        function previousCard() {
+            isFlipped = false;
+            currentCardIndex = (currentCardIndex - 1 + flashcards.length) % flashcards.length;
+            displayCard();
+        }
+
+        function markCorrect() {
+            totalAttempts++;
+            correctCount++;
+            showNotification('Correct! Great job! 🎉', 'success');
+            
+            // Move to next card after marking
+            setTimeout(() => {
+                nextCard();
+            }, 500);
+        }
+
+        function markWrong() {
+            totalAttempts++;
+            showNotification('Keep trying! Review this card again. 💪', 'error');
+            
+            // Add card to end for review (spaced repetition simulation)
+            const currentCard = flashcards[currentCardIndex];
+            currentCard.spacedRepetition = true;
+            flashcards.push({...currentCard});
+            
+            setTimeout(() => {
+                nextCard();
+            }, 500);
+        }
+
+        function shuffleCards() {
+            for (let i = flashcards.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [flashcards[i], flashcards[j]] = [flashcards[j], flashcards[i]];
+            }
+            currentCardIndex = 0;
+            isFlipped = false;
+            displayCard();
+            showNotification('Cards shuffled! 🔀', 'success');
+        }
+
+        function loadJSON(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    if (Array.isArray(data) && data.length > 0) {
+                        flashcards = data.map(card => ({
+                            question: card.question || '',
+                            answer: card.answer || '',
+                            spacedRepetition: card.spacedRepetition || false
+                        }));
+                        currentCardIndex = 0;
+                        isFlipped = false;
+                        correctCount = 0;
+                        totalAttempts = 0;
+                        displayCard();
+                        showNotification('Flashcards loaded successfully! 📚', 'success');
+                    } else {
+                        showNotification('Invalid JSON format. Please check the template.', 'error');
+                    }
+                } catch (error) {
+                    showNotification('Error parsing JSON file.', 'error');
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        function downloadTemplate() {
+            const template = [
+                {
+                    question: "Your question here?",
+                    answer: "Your answer here",
+                    spacedRepetition: false
+                },
+                {
+                    question: "Another question?",
+                    answer: "Another answer",
+                    spacedRepetition: true
+                }
+            ];
+            
+            const dataStr = JSON.stringify(template, null, 2);
+            const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+            
+            const exportFileDefaultName = 'flashcards_template.json';
+            
+            const linkElement = document.createElement('a');
+            linkElement.setAttribute('href', dataUri);
+            linkElement.setAttribute('download', exportFileDefaultName);
+            linkElement.click();
+            
+            showNotification('Template downloaded! 📥', 'success');
+        }
+
+        function loadDeck(deckName) {
+            showNotification(`Loading ${deckName} deck... (Demo feature)`, 'success');
+        }
+
+        function showNotification(message, type) {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.className = 'notification show ' + type;
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+
+        // Enable click on card to flip
+        document.getElementById('flashcard').addEventListener('click', flipCard);
+
+        // Initialize
+        displayCard();
+    </script>
+</body>
+</html>

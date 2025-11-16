@@ -1,0 +1,37 @@
+{
+  "deck_name": "Spanish Vocabulary",
+  "description": "Basic Spanish words and phrases for beginners",
+  "is_public": true,
+  "flashcards": [
+    {
+      "question": "How do you say 'Hello' in Spanish?",
+      "answer": "Hola",
+      "spacedRepetition": false
+    },
+    {
+      "question": "How do you say 'Thank you' in Spanish?",
+      "answer": "Gracias",
+      "spacedRepetition": false
+    },
+    {
+      "question": "How do you say 'Goodbye' in Spanish?",
+      "answer": "Adiós",
+      "spacedRepetition": false
+    },
+    {
+      "question": "How do you say 'Please' in Spanish?",
+      "answer": "Por favor",
+      "spacedRepetition": true
+    },
+    {
+      "question": "How do you say 'Good morning' in Spanish?",
+      "answer": "Buenos días",
+      "spacedRepetition": false
+    },
+    {
+      "question": "How do you say 'Good night' in Spanish?",
+      "answer": "Buenas noches",
+      "spacedRepetition": true
+    }
+  ]
+}

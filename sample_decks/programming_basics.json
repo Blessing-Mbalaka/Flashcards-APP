@@ -1,0 +1,27 @@
+[
+  {
+    "question": "What is Python?",
+    "answer": "Python is a high-level, interpreted programming language known for its simplicity and readability. Created by Guido van Rossum in 1991.",
+    "spacedRepetition": false
+  },
+  {
+    "question": "What is Django?",
+    "answer": "Django is a high-level Python web framework that encourages rapid development and clean, pragmatic design. It follows the MTV (Model-Template-View) pattern.",
+    "spacedRepetition": true
+  },
+  {
+    "question": "What is REST API?",
+    "answer": "REST (Representational State Transfer) is an architectural style for designing networked applications. It uses HTTP requests to access and manipulate data.",
+    "spacedRepetition": false
+  },
+  {
+    "question": "What is JSON?",
+    "answer": "JSON (JavaScript Object Notation) is a lightweight data-interchange format that is easy for humans to read and write and easy for machines to parse and generate.",
+    "spacedRepetition": true
+  },
+  {
+    "question": "What is a database?",
+    "answer": "A database is an organized collection of structured data stored electronically. It allows for efficient storage, retrieval, and manipulation of information.",
+    "spacedRepetition": false
+  }
+]

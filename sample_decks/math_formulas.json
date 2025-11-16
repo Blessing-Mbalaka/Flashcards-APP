@@ -1,0 +1,31 @@
+{
+  "deck_name": "Mathematics Fundamentals",
+  "description": "Essential mathematical concepts and formulas",
+  "flashcards": [
+    {
+      "question": "What is the Pythagorean theorem?",
+      "answer": "a² + b² = c² where c is the hypotenuse of a right triangle and a and b are the other two sides",
+      "spacedRepetition": true
+    },
+    {
+      "question": "What is the quadratic formula?",
+      "answer": "x = (-b ± √(b² - 4ac)) / 2a for equation ax² + bx + c = 0",
+      "spacedRepetition": true
+    },
+    {
+      "question": "What is the area of a circle?",
+      "answer": "A = πr² where r is the radius",
+      "spacedRepetition": false
+    },
+    {
+      "question": "What is the circumference of a circle?",
+      "answer": "C = 2πr where r is the radius",
+      "spacedRepetition": false
+    },
+    {
+      "question": "What is the slope formula?",
+      "answer": "m = (y₂ - y₁) / (x₂ - x₁) where (x₁, y₁) and (x₂, y₂) are two points on a line",
+      "spacedRepetition": true
+    }
+  ]
+}
